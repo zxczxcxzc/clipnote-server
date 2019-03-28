@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/zxczxcxzc/clipnote-share/issues"
   },
-  "homepage": "https://github.com/zxczxcxzc/clipnote-share#readme"
+  "homepage": "https://github.com/zxczxcxzc/clipnote-share#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
 }
