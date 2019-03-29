@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/zxczxcxzc/clipnote-share#readme",
   "dependencies": {
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "mysql": "^2.16.0"
   }
 }
