@@ -4,4 +4,4 @@ const routes = require('./routes')
 
 app.use('/api', routes);
 
-app.listen(80, () => console.log('up'));
+app.listen(3000, () => console.log('up'));
