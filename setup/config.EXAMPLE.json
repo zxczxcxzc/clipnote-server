@@ -1,0 +1,8 @@
+{
+	"serverTitle": "Clipnote Server",
+	"serverMOTD": "I'm an unconfigured Clipnote server!",
+
+	"sqlUsername": "clip",
+	"sqlPassword": "CHANGE_ME",
+	"sqlDB": "clipDB"
+}
