@@ -1,8 +1,10 @@
 {
 	"serverTitle": "Clipnote Server",
-	"serverMOTD": "I'm an unconfigured Clipnote server!",
+	"serverMOTD": "example clipnote server",
 
-	"sqlUsername": "clip",
-	"sqlPassword": "CHANGE_ME",
-	"sqlDB": "clipDB"
+	"sqlUser": "clip",
+	"sqlPassword": "changeme",
+	"sqlDB": "clipDB",
+
+	"uploadSizeLimit": 5000000
 }

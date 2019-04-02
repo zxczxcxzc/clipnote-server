@@ -1,7 +1,11 @@
+/* api endpoints */
 const express = require('express');
-const mysql = require('mysql');
 const multer = require('multer');
+const zip = require('unzipper');
 const uuidv4 = require('uuid/v4');
+const fs = require('fs');
+const db = require('./db');
+const config = JSON.parse(fs.readFileSync('./config.json'));
 
 const router = express.Router();
 
@@ -13,40 +17,58 @@ var storage = multer.diskStorage({
     cb(null, uuidv4()); //Generate a UUIDv4 to use for the filename
   }
 });
-var upload = multer({ storage: storage, limits: {fileSize: 5000000} }); //5MB file limit
+var upload = multer({ storage: storage, limits: {fileSize: config.fileSizeLimit} }); 
 
 
-var connection = mysql.createConnection({
-  host     : 'localhost',
-  user     : 'clip',
-  password : 'temporary', //move these into a config file later
-  database : 'clip'
-});
-connection.connect();
 
+router.get('/info', (req, res) => {
+  res.json({ title: config.serverTitle, motd: config.serverMOTD });
+});   
 
 router.get('/list', (req, res) => {
-	connection.query('SELECT * FROM notes', function (error, results, fields) {
-  		if (error) throw error;
-  		res.json(results);
-	});	
+  db.listNotes(null, (err, notes) => {
+    res.json(notes);
+  });
 });
 
 router.get('/note/:noteId', (req, res) =>  {
-	connection.query('SELECT * FROM notes WHERE uuid = ?', [req.params.noteId], function (error, results, fields) {
-  		if (error) throw error;
-  		res.json(results);
-	});	
+  db.getNote(req.params.noteId, (err, note) => {
+    res.json(note);
+  });
+});
+
+router.get('/download/:noteId', (req, res) => {
+  db.getNote(req.params.noteId, (err, note) => {
+    if(note.length != 0)
+      res.sendFile(req.params.noteId, { root: __dirname + '/data/notes/' });
+    else res.sendStatus(404);
+  });
 });
 
 
 router.post('/upload', upload.single('file'), (req, res) => {
-	//todo: add sanity checks
-	connection.query('INSERT INTO notes (uuid, author) VALUES (?, ?)', [req.file.filename, req.body.author] , function(error, results, fields) {
-		if (error) throw error;
-		res.send("uploaded");
-	});
+  var success = true;
+  fs.createReadStream(__dirname + '/data/notes/' + req.file.filename)
+  .pipe(zip.Parse())
+  .on('entry', (entry) => {
+    if(!(entry.path.endsWith('.png') || entry.path.endsWith('.ogg') || entry.path.endsWith('.ini')))
+      success = false;
+    entry.autodrain();
+  })
+  .on('error', (err) => {
+    success = false;
+  })
+  .on('finish', () => {
+      if(success) {
+        db.insertNote(req.file.filename, req.body.author, (err) => {
+          res.sendStatus(200);
+        });
+      } else {
+        fs.unlink(__dirname + '/data/notes/' + req.file.filename, (err) => { if(err) throw err } );
+        res.sendStatus(400);
+      }
+  });
 });
 
 
-module.exports = router;
+module.exports = router;    
