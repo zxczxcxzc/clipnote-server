@@ -1,4 +1,4 @@
-# clipnote-share
+# clipnote-server
 service for sharing animations created with clipnote studio.
 
 ## setup
