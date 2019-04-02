@@ -1,4 +1,4 @@
-# clipnote-server
+# ![logo](https://i.imgur.com/qS43soQ.png)
 service for sharing animations created with clipnote studio.
 
 ## setup
