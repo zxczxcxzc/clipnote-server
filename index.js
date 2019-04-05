@@ -17,4 +17,4 @@ if (!fs.existsSync(__dirname + '/data')) {
 db.connect(config);
 
 app.use('/v1', routes);
-app.listen(3000, () => console.log('up'));
+app.listen(config.port, () => console.log('up'));
