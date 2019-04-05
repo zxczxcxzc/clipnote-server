@@ -5,7 +5,7 @@
 	"sqlHost": "localhost",
 	"sqlUser": "clip",
 	"sqlPassword": "changeme",
-	"sqlDB": "clipDB",
+	"sqlDB": "clip",
 
 	"uploadSizeLimit": 5000000,
 
