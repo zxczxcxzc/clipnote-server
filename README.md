@@ -1,7 +1,9 @@
 # ![logo](https://i.imgur.com/qS43soQ.png)
 service for sharing animations created with clipnote studio.
-# setup
-## database setup
+# Setup
+Run `npm install` to install the required packages.
+
+## Database Setup
  Create a database (named 'clip' by default, can be changed in config.json) and run the database.sql file to set it up.
  
  ```
@@ -9,5 +11,5 @@ service for sharing animations created with clipnote studio.
  mysql>use clip;
  mysql>source /path/to/setup/database.sql;
  ```
- ## config setup
+ ## Config Setup
   Copy the example config file in /setup to the root directory and rename it to config.json. Change it as necessary.
