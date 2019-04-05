@@ -1,5 +1,6 @@
 /* api endpoints */
 const express = require('express');
+const basicAuth = require('express-basic-auth')
 const multer = require('multer');
 const zip = require('unzipper');
 const uuidv4 = require('uuid/v4');
@@ -9,12 +10,22 @@ const config = JSON.parse(fs.readFileSync('./config.json'));
 
 const router = express.Router();
 
+/*
+router.use(basicAuth({
+    users: { 'nobody': 'pass' },
+    unauthorizedResponse: getUnauthorizedResponse
+}));
+
+function getUnauthorizedResponse(req) {
+  return "Authorization Error";
+} */
+
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'data/notes');
   },
   filename: function (req, file, cb) {
-    cb(null, uuidv4()); //Generate a UUIDv4 to use for the filename
+    cb(null, uuidv4()); 
   }
 });
 var upload = multer({ storage: storage, limits: {fileSize: config.fileSizeLimit} }); 
@@ -45,7 +56,6 @@ router.get('/download/:noteId', (req, res) => {
   });
 });
 
-
 router.post('/upload', upload.single('file'), (req, res) => {
   var success = true;
   fs.createReadStream(__dirname + '/data/notes/' + req.file.filename)
@@ -65,7 +75,7 @@ router.post('/upload', upload.single('file'), (req, res) => {
         });
       } else {
         fs.unlink(__dirname + '/data/notes/' + req.file.filename, (err) => { if(err) throw err } );
-        res.sendStatus(400);
+        res.sendStatus(400); 
       }
   });
 });
