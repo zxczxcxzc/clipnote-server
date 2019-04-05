@@ -4,7 +4,7 @@ var connection;
 module.exports = {
 	connect: function(config) {
 		connection = mysql.createConnection({
- 			host     : 'localhost',
+ 			host     : config.sqlHost,
   			user     : config.sqlUser,
 			password : config.sqlPassword, 
 			database : config.sqlDB

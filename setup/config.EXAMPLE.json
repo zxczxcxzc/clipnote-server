@@ -2,6 +2,7 @@
 	"serverTitle": "Clipnote Server",
 	"serverMOTD": "example clipnote server",
 
+	"sqlHost": "localhost",
 	"sqlUser": "clip",
 	"sqlPassword": "changeme",
 	"sqlDB": "clipDB",
