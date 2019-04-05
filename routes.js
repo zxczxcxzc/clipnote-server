@@ -26,9 +26,9 @@ var storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     cb(null, uuidv4()); 
-  }
+  } 
 });
-var upload = multer({ storage: storage, limits: {fileSize: config.fileSizeLimit} }); 
+var upload = multer({ storage: storage, limits: { fileSize: config.fileSizeLimit } }); 
 
 
 
@@ -57,19 +57,22 @@ router.get('/download/:noteId', (req, res) => {
 });
 
 router.post('/upload', upload.single('file'), (req, res) => {
-  var success = true;
+  var validFiles = true;
+  var validFrames;
   fs.createReadStream(__dirname + '/data/notes/' + req.file.filename)
   .pipe(zip.Parse())
   .on('entry', (entry) => {
     if(!(entry.path.endsWith('.png') || entry.path.endsWith('.ogg') || entry.path.endsWith('.ini')))
-      success = false;
+      validFiles = false;
+    if(entry.path.includes('0,') && entry.path.endsWith('.png'))
+      validFrames = true;
     entry.autodrain();
   })
   .on('error', (err) => {
-    success = false;
+    validFiles = false;
   })
   .on('finish', () => {
-      if(success) {
+      if(validFiles && validFrames) {
         db.insertNote(req.file.filename, req.body.author, (err) => {
           res.sendStatus(200);
         });
