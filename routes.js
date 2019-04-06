@@ -34,7 +34,11 @@ var upload = multer({ storage: storage, limits: { fileSize: config.fileSizeLimit
 
 router.get('/info', (req, res) => {
   res.json({ title: config.serverTitle, motd: config.serverMOTD });
-});   
+});  
+
+router.get('/icon', (req, res) => {
+  res.sendFile('./icon.png', { root: __dirname });
+});
 
 router.get('/list', (req, res) => {
   db.listNotes(null, (err, notes) => {
