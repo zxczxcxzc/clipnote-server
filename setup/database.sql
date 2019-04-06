@@ -20,7 +20,7 @@ CREATE TABLE `notes` (
   `rating` int(11) NOT NULL DEFAULT '0',
   `time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 --
@@ -40,3 +40,4 @@ CREATE TABLE `users` (
 
 
 -- Dump completed on 2019-04-04 21:17:32
+
