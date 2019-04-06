@@ -30,7 +30,7 @@ module.exports = {
 		});
 	},
 
-	addStar: function(uuid, stars cb) {
+	addStar: function(uuid, stars, cb) {
 		connection.query('UPDATE notes SET rating = rating + ? WHERE uuid = ?', [stars, uuid], function (error, results, fields) {
 			return cb(error);
 		});
