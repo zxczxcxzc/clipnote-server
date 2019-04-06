@@ -32,7 +32,7 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` varchar(45) NOT NULL,
   `nick` varchar(45) DEFAULT NULL,
-  `stars` int(11) DEFAULT NULL,
+  `stars` int(11) DEFAULT '0',
   `joinDate` date NOT NULL,
   `hash` varchar(99) NOT NULL,
   PRIMARY KEY (`id`)
