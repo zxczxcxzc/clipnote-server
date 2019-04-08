@@ -13,9 +13,12 @@ module.exports = {
 	},
 
 	listNotes: function(page, cb) {
-		if(page === undefined) page = 1;
+		var pageQuery = 'SELECT uuid, author, locked, rating, time FROM notes WHERE hidden = 0 LIMIT ?, 6';
+		var allQuery = 'SELECT uuid, author, locked, rating, time FROM notes WHERE hidden = 0';
+		var query = pageQuery;
+		if(page === undefined) query = allQuery;
 		start_index = (page - 1) * 6;
-		connection.query('SELECT uuid, author, locked, rating, time FROM notes WHERE hidden = 0 LIMIT ?, 6', [start_index], function (error, results, fields) {
+		connection.query(query, [start_index], function (error, results, fields) {
 			return cb(error, results);
 		});
 	},
