@@ -18,7 +18,7 @@ router.use(basicAuth({
 
 function getUnauthorizedResponse(req) {
   return "Authorization Error";
-} */
+  } */
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -37,7 +37,7 @@ router.get('/info', (req, res) => {
 });  
 
 router.get('/icon', (req, res) => {
-  res.sendFile('./icon.png', { root: __dirname });
+  res.sendFile('icon.png', { root: __dirname });
 });
 
 router.get('/list', (req, res) => {
@@ -49,6 +49,17 @@ router.get('/list', (req, res) => {
 router.get('/note/:noteId', (req, res) =>  {
   db.getNote(req.params.noteId, (err, note) => {
     res.json(note);
+  });
+});
+
+router.get('/thumbnail/:noteId', (req, res) => {
+  db.getNote(req.params.noteId, (err, note) => {
+    if(note.length != 0) {
+      fs.access(__dirname + '/data/thumbnails/' + req.params.noteId + '.png', fs.F_OK, (err) => {
+        if(err) res.sendStatus(404);
+        else res.sendFile(req.params.noteId + '.png', { root: __dirname + '/data/thumbnails/' });
+      });
+    } else res.sendStatus(404);
   });
 });
 
@@ -66,11 +77,17 @@ router.post('/upload', upload.single('file'), (req, res) => {
   fs.createReadStream(__dirname + '/data/notes/' + req.file.filename)
   .pipe(zip.Parse())
   .on('entry', (entry) => {
-    if(!(entry.path.endsWith('.png') || entry.path.endsWith('.ogg') || entry.path.endsWith('.ini')))
+    if(!(entry.path.endsWith('.png') || entry.path.endsWith('.ogg') || entry.path.endsWith('.ini'))) {
       validFiles = false;
-    if(entry.path.includes('0,') && entry.path.endsWith('.png'))
+      entry.autodrain();
+    }
+    if(entry.path.includes('0,') && entry.path.endsWith('.png')) {
       validFrames = true;
-    entry.autodrain();
+      entry.autodrain();
+    }
+    if(entry.path = "thumb.png") {
+      entry.pipe(fs.createWriteStream(__dirname + '/data/thumbnails/' + req.file.filename + '.png'));
+    }
   })
   .on('error', (err) => {
     validFiles = false;
