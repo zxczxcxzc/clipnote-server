@@ -81,26 +81,29 @@ router.post('/upload', upload.single('file'), (req, res) => {
       validFiles = false;
       entry.autodrain();
     }
-    if(entry.path.includes('0,') && entry.path.endsWith('.png')) {
+    else if(entry.path.includes('0,') && entry.path.endsWith('.png')) {
       validFrames = true;
-      entry.autodrain();
+      entry.autodrain()
     }
-    if(entry.path = "thumb.png") {
+    else if(entry.path == "thumb.png") {
       entry.pipe(fs.createWriteStream(__dirname + '/data/thumbnails/' + req.file.filename + '.png'));
     }
+    else entry.autodrain();
+  
   })
   .on('error', (err) => {
     validFiles = false;
   })
   .on('finish', () => {
-      if(validFiles && validFrames) {
-        db.insertNote(req.file.filename, req.body.author, (err) => {
-          res.sendStatus(200);
-        });
-      } else {
-        fs.unlink(__dirname + '/data/notes/' + req.file.filename, (err) => { if(err) throw err } );
-        res.sendStatus(400); 
-      }
+    console.log('finish')
+    if(validFiles && validFrames) {
+      db.insertNote(req.file.filename, req.body.author, (err) => {
+        res.sendStatus(200);
+      });
+    } else {
+      fs.unlink(__dirname + '/data/notes/' + req.file.filename, (err) => { if(err) throw err } );
+      res.sendStatus(400); 
+    }
   });
 });
 
