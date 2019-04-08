@@ -18,4 +18,4 @@ if (!fs.existsSync(__dirname + '/data')) {
 db.connect(config);
 
 app.use('/v1', routes);
-app.listen(config.port, () => console.log('-clipnote server v.' + version + '-'));
+app.listen(config.port, () => console.log('-clipnote server v' + version + '-'));

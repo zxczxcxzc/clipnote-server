@@ -41,7 +41,7 @@ router.get('/icon', (req, res) => {
 });
 
 router.get('/list', (req, res) => {
-  db.listNotes(null, (err, notes) => {
+  db.listNotes(req.query.page, (err, notes) => {
     res.json(notes);
   });
 });
@@ -72,6 +72,7 @@ router.get('/download/:noteId', (req, res) => {
 });
 
 router.post('/upload', upload.single('file'), (req, res) => {
+  console.log('Starting upload ' + req.file.filename);
   var validFiles = true;
   var validFrames;
   fs.createReadStream(__dirname + '/data/notes/' + req.file.filename)
@@ -95,12 +96,13 @@ router.post('/upload', upload.single('file'), (req, res) => {
     validFiles = false;
   })
   .on('finish', () => {
-    console.log('finish')
     if(validFiles && validFrames) {
+      console.log('Upload ' + req.file.filename + ' completed.');
       db.insertNote(req.file.filename, req.body.author, (err) => {
         res.sendStatus(200);
       });
     } else {
+      console.log('Upload ' + req.file.filename + ' failed: invalid files');
       fs.unlink(__dirname + '/data/notes/' + req.file.filename, (err) => { if(err) throw err } );
       res.sendStatus(400); 
     }
