@@ -7,6 +7,7 @@ const db = require('./db');
 const routes = require('./routes');
 const config = JSON.parse(fs.readFileSync('./config.json'));
 
+var version = 0.1;
 
 if (!fs.existsSync(__dirname + '/data')) {
 	fs.mkdirSync(__dirname + '/data');
@@ -17,4 +18,4 @@ if (!fs.existsSync(__dirname + '/data')) {
 db.connect(config);
 
 app.use('/v1', routes);
-app.listen(config.port, () => console.log('up'));
+app.listen(config.port, () => console.log('-clipnote server v.' + version + '-'));
