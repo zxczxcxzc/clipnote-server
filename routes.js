@@ -18,7 +18,8 @@ router.use(basicAuth({
 
 function getUnauthorizedResponse(req) {
   return "Authorization Error";
-} */
+} 
+*/
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -41,7 +42,7 @@ router.get('/icon', (req, res) => {
 });
 
 router.get('/list', (req, res) => {
-  db.listNotes(req.query.page, (err, notes) => {
+  db.listNotes(req.query.page, req.query.sort, (err, notes) => {
     res.json(notes);
   });
 });
@@ -65,7 +66,7 @@ router.get('/thumbnail/:noteId', (req, res) => {
 
 router.get('/download/:noteId', (req, res) => {
   var id = req.params.noteId;
-  console.log(id)
+
   if(id.endsWith('.clip'))
     id = id.split('.clip')[0];
 
