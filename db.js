@@ -13,9 +13,7 @@ module.exports = {
 	},
 
 	listNotes: function(page, sort, cb) {
-		var query = 'SELECT uuid, author, locked, rating, time FROM notes WHERE hidden = 0';
-		
-
+		var query = 'SELECT uuid, author, locked, spinoff, rating, time FROM notes WHERE hidden = 0';
 		switch (sort) {
 			case 'time':
 				query += ' ORDER BY time DESC';
@@ -25,7 +23,6 @@ module.exports = {
 				break;
 		}
 		if(page !== undefined) query += ' LIMIT ?, 6';
-		console.log(query);
 		start_index = (page - 1) * 6;
 		connection.query(query, [start_index], function (error, results, fields) {
 			return cb(error, results);
