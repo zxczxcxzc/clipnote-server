@@ -30,7 +30,7 @@ module.exports = {
 	},
 
 	getNote: function(note, cb) {
-		connection.query('SELECT uuid, author, locked, rating, time FROM notes WHERE uuid = ?', [note], function (error, results, fields) {
+		connection.query('SELECT uuid, author, locked, spinoff, rating, time FROM notes WHERE uuid = ?', [note], function (error, results, fields) {
   			return cb(error, results);
 		});	
 	},
