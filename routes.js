@@ -64,9 +64,14 @@ router.get('/thumbnail/:noteId', (req, res) => {
 });
 
 router.get('/download/:noteId', (req, res) => {
-  db.getNote(req.params.noteId, (err, note) => {
+  var id = req.params.noteId;
+  console.log(id)
+  if(id.endsWith('.clip'))
+    id = id.split('.clip')[0];
+
+  db.getNote(id, (err, note) => {
     if(note.length != 0)
-      res.download(__dirname + '/data/notes/' + req.params.noteId, req.params.noteId + '.clip');
+      res.download(__dirname + '/data/notes/' + id, id + '.clip');
     else res.sendStatus(404);
   });
 });
