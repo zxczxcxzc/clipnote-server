@@ -18,7 +18,7 @@ router.use(basicAuth({
 
 function getUnauthorizedResponse(req) {
   return "Authorization Error";
-  } */
+} */
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -66,7 +66,7 @@ router.get('/thumbnail/:noteId', (req, res) => {
 router.get('/download/:noteId', (req, res) => {
   db.getNote(req.params.noteId, (err, note) => {
     if(note.length != 0)
-      res.sendFile(req.params.noteId, { root: __dirname + '/data/notes/' });
+      res.download(__dirname + '/data/notes/' + req.params.noteId, req.params.noteId + '.clip');
     else res.sendStatus(404);
   });
 });
@@ -84,7 +84,7 @@ router.post('/upload', upload.single('file'), (req, res) => {
     }
     else if(entry.path.includes('0,') && entry.path.endsWith('.png')) {
       validFrames = true;
-      entry.autodrain()
+      entry.autodrain();
     }
     else if(entry.path == "thumb.png") {
       entry.pipe(fs.createWriteStream(__dirname + '/data/thumbnails/' + req.file.filename + '.png'));
@@ -103,7 +103,7 @@ router.post('/upload', upload.single('file'), (req, res) => {
       });
     } else {
       console.log('Upload ' + req.file.filename + ' failed: invalid files');
-      fs.unlink(__dirname + '/data/notes/' + req.file.filename, (err) => { if(err) throw err } );
+      fs.unlink(__dirname + '/data/notes/' + req.file.filename, (err) => { if(err) throw err });
       res.sendStatus(400); 
     }
   });
