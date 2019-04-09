@@ -41,6 +41,10 @@ router.get('/icon', (req, res) => {
   res.sendFile('icon.png', { root: __dirname });
 });
 
+router.get('/header', (req, res) => {
+  res.sendFile('header.png', { root: __dirname });
+})
+
 router.get('/list', (req, res) => {
   db.listNotes(req.query.page, req.query.sort, (err, notes) => {
     res.json(notes);
