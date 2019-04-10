@@ -16,6 +16,7 @@ CREATE TABLE `notes` (
   `uuid` varchar(45) NOT NULL,
   `author` varchar(45) NOT NULL,
   `locked` tinyint(4) NOT NULL DEFAULT '0',
+  `spinoff` tinyint(4) NOT NULL DEFAULT '0',
   `hidden` tinyint(45) NOT NULL DEFAULT '0',
   `rating` int(11) NOT NULL DEFAULT '0',
   `time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -31,6 +32,7 @@ DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
   `id` varchar(45) NOT NULL,
+  `permissions` int(1) NOT NULL DEFAULT '1',
   `nick` varchar(45) DEFAULT NULL,
   `stars` int(11) DEFAULT '0',
   `joinDate` date NOT NULL,

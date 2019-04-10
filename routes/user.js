@@ -5,12 +5,12 @@ const multer = require('multer');
 const zip = require('unzipper');
 const uuidv4 = require('uuid/v4');
 const fs = require('fs');
-const db = require('./db');
+const db = require('../db');
 const config = JSON.parse(fs.readFileSync('./config.json'));
 
 const router = express.Router();
 
-/*
+
 router.use(basicAuth({
     users: { 'nobody': 'pass' },
     unauthorizedResponse: getUnauthorizedResponse
@@ -19,7 +19,6 @@ router.use(basicAuth({
 function getUnauthorizedResponse(req) {
   return "Authorization Error";
 } 
-*/
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -33,59 +32,16 @@ var upload = multer({ storage: storage, limits: { fileSize: config.fileSizeLimit
 
 
 
-router.get('/info', (req, res) => {
-  res.json({ title: config.serverTitle, motd: config.serverMOTD });
-});  
-
-router.get('/icon', (req, res) => {
-  res.sendFile('icon.png', { root: __dirname });
+router.get('/profile/:id', (req, res) => {
+  res.send('profile');
 });
 
-router.get('/header', (req, res) => {
-  res.sendFile('header.png', { root: __dirname });
-})
-
-router.get('/list', (req, res) => {
-  db.listNotes(req.query.page, req.query.sort, (err, notes) => {
-    res.json(notes);
-  });
-});
-
-router.get('/note/:noteId', (req, res) =>  {
-  db.getNote(req.params.noteId, (err, note) => {
-    res.json(note);
-  });
-});
-
-router.get('/thumbnail/:noteId', (req, res) => {
-  db.getNote(req.params.noteId, (err, note) => {
-    if(note.length != 0) {
-      fs.access(__dirname + '/data/thumbnails/' + req.params.noteId + '.png', fs.F_OK, (err) => {
-        if(err) res.sendStatus(404);
-        else res.sendFile(req.params.noteId + '.png', { root: __dirname + '/data/thumbnails/' });
-      });
-    } else res.sendStatus(404);
-  });
-});
-
-router.get('/download/:noteId', (req, res) => {
-  var id = req.params.noteId;
-
-  if(id.endsWith('.clip'))
-    id = id.split('.clip')[0];
-
-  db.getNote(id, (err, note) => {
-    if(note.length != 0)
-      res.download(__dirname + '/data/notes/' + id, id + '.clip');
-    else res.sendStatus(404);
-  });
-});
 
 router.post('/upload', upload.single('file'), (req, res) => {
   console.log('Starting upload ' + req.file.filename);
   var validFiles = true;
   var validFrames;
-  fs.createReadStream(__dirname + '/data/notes/' + req.file.filename)
+  fs.createReadStream('data/notes/' + req.file.filename)
   .pipe(zip.Parse())
   .on('entry', (entry) => {
     if(!(entry.path.endsWith('.png') || entry.path.endsWith('.ogg') || entry.path.endsWith('.ini'))) {
@@ -97,7 +53,7 @@ router.post('/upload', upload.single('file'), (req, res) => {
       entry.autodrain();
     }
     else if(entry.path == "thumb.png") {
-      entry.pipe(fs.createWriteStream(__dirname + '/data/thumbnails/' + req.file.filename + '.png'));
+      entry.pipe(fs.createWriteStream('data/thumbnails/' + req.file.filename + '.png'));
     }
     else entry.autodrain();
   
@@ -106,6 +62,7 @@ router.post('/upload', upload.single('file'), (req, res) => {
     validFiles = false;
   })
   .on('finish', () => {
+
     if(validFiles && validFrames) {
       console.log('Upload ' + req.file.filename + ' completed.');
       db.insertNote(req.file.filename, req.body.author, (err) => {
@@ -113,7 +70,7 @@ router.post('/upload', upload.single('file'), (req, res) => {
       });
     } else {
       console.log('Upload ' + req.file.filename + ' failed: invalid files');
-      fs.unlink(__dirname + '/data/notes/' + req.file.filename, (err) => { if(err) throw err });
+      fs.unlink('data/notes/' + req.file.filename, (err) => { if(err) throw err });
       res.sendStatus(400); 
     }
   });
