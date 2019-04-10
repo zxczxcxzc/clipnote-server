@@ -42,7 +42,7 @@ router.get('/download/:noteId', (req, res) => {
 
   db.getNote(id, (err, note) => {
     if(note.length != 0)
-      res.download(__dirname + '/data/notes/' + id, id + '.clip');
+      res.download(__dirname + '/../data/notes/' + id, id + '.clip');
     else res.sendStatus(404);
   });
 });
