@@ -13,6 +13,7 @@ module.exports = {
 	},
 
 	listNotes: function(page, sort, cb) {
+		var totalQuery = 'SELECT count(id) FROM notes WHERE hidden = 0';
 		var query = 'SELECT uuid, author, locked, spinoff, rating, time FROM notes WHERE hidden = 0';
 		switch (sort) {
 			case 'time':
@@ -24,8 +25,11 @@ module.exports = {
 		}
 		if(page !== undefined) query += ' LIMIT ?, 6';
 		start_index = (page - 1) * 6;
-		connection.query(query, [start_index], function (error, results, fields) {
-			return cb(error, results);
+		connection.query(totalQuery, function(error, results, fields) {
+			connection.query(query, [start_index], function (err, res, field) {
+				var totalPages = results[0]['count(id)'] / 6;
+				return cb(err, res, totalPages);
+			});
 		});
 	},
 
@@ -55,7 +59,6 @@ module.exports = {
 
 	addStar: function(user, uuid, cb) {
 		this.getUser(user, (err, res) => {
-			console.log(user)
 			if(res[0].stars <= 0) return cb("ERROR: No stars");
 			else {
 				connection.query('UPDATE users SET stars = stars - 1 WHERE username = ?', [user], function(error, results, fields) {

@@ -1,5 +1,5 @@
 /* clipnote server */
-var version = 0.2;
+var version = 0.3;
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs');

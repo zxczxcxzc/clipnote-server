@@ -9,8 +9,12 @@ const router = express.Router();
 
 
 router.get('/list', (req, res) => {
-  db.listNotes(req.query.page, req.query.sort, (err, notes) => {
-    res.json(notes);
+  db.listNotes(req.query.page, req.query.sort, (err, notes, totalPages) => {
+    response = {
+      notes: notes,
+      totalPages: (Math.floor(totalPages))
+    }
+    res.json(response);
   });
 });
 
