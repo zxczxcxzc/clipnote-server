@@ -1,6 +1,7 @@
 /* clipnote server */
 var version = 0.2;
 const express = require('express');
+const cors = require('cors');
 const fs = require('fs');
 const app = express();
 const db = require('./db.js');
@@ -18,6 +19,8 @@ if (!fs.existsSync(__dirname + '/data')) {
 }
 
 db.connect(config);
+
+app.use(cors());
 
 app.use('/info', info);
 app.use('/note', note);

@@ -18,6 +18,7 @@
   "homepage": "https://github.com/zxczxcxzc/clipnote-share#readme",
   "dependencies": {
     "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
     "express": "^4.16.4",
     "express-basic-auth": "^1.1.6",
     "multer": "^1.4.1",

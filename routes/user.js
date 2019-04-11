@@ -21,7 +21,7 @@ function getUnauthorizedResponse(req) {
 } 
 
 var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
+  destination: function (req, file, cb) {2
     cb(null, 'data/notes');
   },
   filename: function (req, file, cb) {
