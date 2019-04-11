@@ -32,9 +32,8 @@ DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `uuid` varchar(45) NOT NULL,
+  `username` varchar(45) NOT NULL,
   `permissions` int(1) NOT NULL DEFAULT '1',
-  `nick` varchar(45) NOT NULL,
   `stars` int(11) DEFAULT '0',
   `joinDate` date NOT NULL,
   `hash` varchar(99) NOT NULL,
