@@ -1,6 +1,7 @@
-/* api endpoints */
 const express = require('express');
-const basicAuth = require('express-basic-auth')
+const bcrypt = require('bcrypt');
+const basicAuth = require('express-basic-auth');
+const bodyParser = require('body-parser');
 const multer = require('multer');
 const zip = require('unzipper');
 const uuidv4 = require('uuid/v4');
@@ -10,18 +11,32 @@ const config = JSON.parse(fs.readFileSync('./config.json'));
 
 const router = express.Router();
 
+router.use(bodyParser.urlencoded({ extended: false }));
+router.use(bodyParser.json());
 
 router.use(basicAuth({
-    users: { 'nobody': 'pass' },
-    unauthorizedResponse: getUnauthorizedResponse
+  authorizer: authorizer,
+  authorizeAsync: true,
+  unauthorizedResponse: getUnauthorizedResponse
 }));
+
+function authorizer(username, password, cb) {
+  db.getUserHash(username, (err, response) => {
+    if(response.length == 0)
+      return cb(null, false);
+    else bcrypt.compare(password, response[0].hash).then(function(res) {
+      return cb(null, res);
+    });
+  });
+}
 
 function getUnauthorizedResponse(req) {
   return "Authorization Error";
 } 
 
+
 var storage = multer.diskStorage({
-  destination: function (req, file, cb) {2
+  destination: function (req, file, cb) {
     cb(null, 'data/notes');
   },
   filename: function (req, file, cb) {
@@ -31,11 +46,12 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage, limits: { fileSize: config.fileSizeLimit } }); 
 
 
-
-router.get('/profile/:id', (req, res) => {
-  res.send('profile');
+router.post('/vote', (req, res) => {
+  db.addStar(req.auth.user, req.body.id, (err) => {
+    if(!err) res.sendStatus(200);
+    else res.sendStatus(400);
+  });
 });
-
 
 router.post('/upload', upload.single('file'), (req, res) => {
   console.log('Starting upload ' + req.file.filename);

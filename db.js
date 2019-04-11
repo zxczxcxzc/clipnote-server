@@ -41,9 +41,33 @@ module.exports = {
 		});
 	},
 
-	addStar: function(uuid, stars, cb) {
-		connection.query('UPDATE notes SET rating = rating + ? WHERE uuid = ?', [stars, uuid], function (error, results, fields) {
-			return cb(error);
+	getUser: function(username, cb) {
+		connection.query('SELECT username, permissions, stars, joinDate FROM users WHERE username = ?', [username], function(error, results, fields) {
+			return cb(error, results);
 		});
-	}
+	},
+
+	getUserHash: function(username, cb) {
+		connection.query('SELECT hash FROM users WHERE username = ?', [username], function(error, results, fields) {
+			return cb(error, results);
+		});
+	},
+
+	addStar: function(user, uuid, cb) {
+		this.getUser(user, (err, res) => {
+			console.log(user)
+			if(res[0].stars <= 0) return cb("ERROR: No stars");
+			else {
+				connection.query('UPDATE users SET stars = stars - 1 WHERE username = ?', [user], function(error, results, fields) {
+					if(error) return cb(error);
+					else {
+						connection.query('UPDATE notes SET rating = rating + 1 WHERE uuid = ?', [uuid], function(e, r, f) {
+							if(error) return cb(error);
+							else return cb(null);
+						});
+					}
+				});
+			}
+		});
+	},
 };
