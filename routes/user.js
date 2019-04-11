@@ -81,7 +81,7 @@ router.post('/upload', upload.single('file'), (req, res) => {
 
     if(validFiles && validFrames) {
       console.log('Upload ' + req.file.filename + ' completed.');
-      db.insertNote(req.file.filename, req.body.author, (err) => {
+      db.insertNote(req.file.filename, req.auth.user, (err) => {
         res.sendStatus(200);
       });
     } else {
