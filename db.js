@@ -27,7 +27,8 @@ module.exports = {
 		start_index = (page - 1) * 6;
 		connection.query(totalQuery, function(error, results, fields) {
 			connection.query(query, [start_index], function (err, res, field) {
-				var totalPages = results[0]['count(id)'] / 6;
+				var totalPages = Math.ceil(results[0]['count(id)'] / 6);
+
 				return cb(err, res, totalPages);
 			});
 		});

@@ -12,7 +12,7 @@ router.get('/list', (req, res) => {
   db.listNotes(req.query.page, req.query.sort, (err, notes, totalPages) => {
     response = {
       notes: notes,
-      totalPages: (Math.floor(totalPages))
+      totalPages: totalPages
     }
     res.json(response);
   });
