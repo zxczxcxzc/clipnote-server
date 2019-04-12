@@ -5,7 +5,7 @@ const router = express.Router();
 
 
 router.get('/', (req, res) => {
-  res.json({ title: config.serverTitle, motd: config.serverMOTD });
+  res.json({ title: config.serverTitle, motd: config.serverMOTD, signup: config.signupURL });
 });  
 
 router.get('/icon', (req, res) => {

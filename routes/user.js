@@ -21,10 +21,10 @@ router.use(basicAuth({
 }));
 
 function authorizer(username, password, cb) {
-  db.getUserHash(username, (err, response) => {
-    if(response.length == 0)
+  db.getUserHash(username, (err, hash) => {
+    if(err)
       return cb(null, false);
-    else bcrypt.compare(password, response[0].hash).then(function(res) {
+    else bcrypt.compare(password, hash).then(function(res) {
       return cb(null, res);
     });
   });
@@ -45,6 +45,14 @@ var storage = multer.diskStorage({
 });
 var upload = multer({ storage: storage, limits: { fileSize: config.fileSizeLimit } }); 
 
+/* -- */
+
+router.get('/profile/:id', (req, res) => {
+  db.getUser(req.params.id, (err, profile) => {
+    res.json(profile);
+  });
+});
+
 
 router.post('/vote', (req, res) => {
   db.addStar(req.auth.user, req.body.id, (err) => {
@@ -54,6 +62,7 @@ router.post('/vote', (req, res) => {
 });
 
 router.post('/upload', upload.single('file'), (req, res) => {
+
   console.log('Starting upload ' + req.file.filename);
   var validFiles = true;
   var validFrames;

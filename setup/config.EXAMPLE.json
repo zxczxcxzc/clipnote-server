@@ -1,6 +1,7 @@
 {
 	"serverTitle": "Clipnote Server",
 	"serverMOTD": "example clipnote server",
+	"signupURL": "example.com/signup",
 
 	"sqlHost": "localhost",
 	"sqlUser": "clip",

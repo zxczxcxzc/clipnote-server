@@ -1,4 +1,4 @@
-/* database functions */
+	/* database functions */
 const mysql = require('mysql');
 var connection;
 module.exports = {
@@ -28,8 +28,11 @@ module.exports = {
 		connection.query(totalQuery, function(error, results, fields) {
 			connection.query(query, [start_index], function (err, res, field) {
 				var totalPages = Math.ceil(results[0]['count(id)'] / 6);
-
-				return cb(err, res, totalPages);
+				var response = {
+			     	notes:      res,
+			     	totalPages: totalPages
+			    }
+				return cb(err, response);
 			});
 		});
 	},
@@ -47,14 +50,25 @@ module.exports = {
 	},
 
 	getUser: function(username, cb) {
-		connection.query('SELECT username, permissions, stars, joinDate FROM users WHERE username = ?', [username], function(error, results, fields) {
-			return cb(error, results);
+		connection.query('SELECT SUM(rating) FROM notes WHERE author = ?', [username], function(error, results, fields) {
+			var totalStars = results[0]['SUM(rating)'];
+			connection.query('SELECT username, permissions, stars, joinDate FROM users WHERE username = ?', [username], function(err, res, field) {
+				var response = {
+					username: 	 res[0].username,
+					permissions: res[0].permissions,
+					noteStars:   totalStars,
+					userStars:   res[0].stars,
+					joinDate:    res[0].joinDate
+				}
+				return cb(error, response);
+			});
 		});
+		
 	},
 
 	getUserHash: function(username, cb) {
 		connection.query('SELECT hash FROM users WHERE username = ?', [username], function(error, results, fields) {
-			return cb(error, results);
+			return cb(error, results[0].hash);
 		});
 	},
 
@@ -73,5 +87,5 @@ module.exports = {
 				});
 			}
 		});
-	},
+	}
 };
