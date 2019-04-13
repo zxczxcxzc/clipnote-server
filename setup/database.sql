@@ -35,7 +35,9 @@ CREATE TABLE `users` (
   `username` varchar(45) NOT NULL,
   `permissions` int(1) NOT NULL DEFAULT '1',
   `stars` int(11) DEFAULT '0',
-  `joinDate` date NOT NULL,
+  `joinDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `lastLogin` timestamp,
+  `banExpires` timestamp DEFAULT NULL,
   `hash` varchar(99) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
