@@ -36,7 +36,7 @@ CREATE TABLE `users` (
   `permissions` int(1) NOT NULL DEFAULT '1',
   `stars` int(11) DEFAULT '0',
   `joinDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `lastLogin` timestamp,
+  `lastLogin` timestamp DEFAULT CURRENT_TIMESTAMP,
   `banExpires` timestamp,
   `hash` varchar(99) NOT NULL,
   PRIMARY KEY (`id`)
