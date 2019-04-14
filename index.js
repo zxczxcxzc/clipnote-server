@@ -1,5 +1,4 @@
 /* clipnote server */
-var version = 0.3;
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
@@ -27,4 +26,4 @@ app.use('/note', note);
 app.use('/user', user);
 
 
-app.listen(config.port, () => console.log('-clipnote server v' + version + '-'));
+app.listen(config.port, () => console.log('-clipnote server v' + config.serverVersion + '-'));
