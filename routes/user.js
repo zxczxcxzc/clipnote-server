@@ -43,9 +43,7 @@ var storage = multer.diskStorage({
     cb(null, uuidv4()); 
   } 
 });
-var upload = multer({ storage: storage, limits: { fileSize: config.fileSizeLimit } }); 
-
-/* -- */
+var upload = multer({ storage: storage, limits: { fileSize: config.uploadSizeLimit } }); 
 
 router.get('/profile/:id', (req, res) => {
   db.getUser(req.params.id, (err, profile) => {
@@ -55,7 +53,7 @@ router.get('/profile/:id', (req, res) => {
 
 
 router.post('/vote', (req, res) => {
-  db.addStar(req.auth.user, req.body.id, (err) => {
+  db.addNoteStar(req.auth.user, req.body.id, (err) => {
     if(!err) res.sendStatus(200);
     else res.sendStatus(400);
   });

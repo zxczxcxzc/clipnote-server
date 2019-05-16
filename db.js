@@ -72,7 +72,13 @@ module.exports = {
 		});
 	},
 
-	addStar: function(user, uuid, cb) {
+	addUserStar: function(username, stars, cb) {
+		connection.query('UPDATE users SET stars = stars + ? WHERE username = ?', [stars, username], function(error, results, fields) {
+			return cb(error);
+		});
+	},
+
+	addNoteStar: function(user, uuid, cb) {
 		this.getUser(user, (err, res) => {
 			if(res[0].stars <= 0) return cb("ERROR: No stars");
 			else {
@@ -87,5 +93,6 @@ module.exports = {
 				});
 			}
 		});
-	}
+	},
+
 };
