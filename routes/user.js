@@ -8,7 +8,7 @@ const uuidv4 = require('uuid/v4');
 const fs = require('fs');
 const db = require('../db');
 const config = JSON.parse(fs.readFileSync('./config.json'));
-
+const log = require('../log');
 const router = express.Router();
 
 router.use(bodyParser.urlencoded({ extended: false }));
@@ -22,7 +22,7 @@ router.use(basicAuth({
 
 function authorizer(username, password, cb) {
   db.getUserHash(username, (err, hash) => {
-    if(err)
+    if(err || hash === null)
       return cb(null, false);
     else bcrypt.compare(password, hash).then(function(res) {
       return cb(null, res);
@@ -34,7 +34,6 @@ function getUnauthorizedResponse(req) {
   return "Authorization Error";
 } 
 
-
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'data/notes');
@@ -42,7 +41,7 @@ var storage = multer.diskStorage({
   filename: function (req, file, cb) {
     cb(null, uuidv4()); 
   } 
-});
+}); 
 var upload = multer({ storage: storage, limits: { fileSize: config.uploadSizeLimit } }); 
 
 router.get('/profile/:id', (req, res) => {
@@ -51,19 +50,11 @@ router.get('/profile/:id', (req, res) => {
   });
 });
 
-
-router.post('/vote', (req, res) => {
-  db.addNoteStar(req.auth.user, req.body.id, (err) => {
-    if(!err) res.sendStatus(200);
-    else res.sendStatus(400);
-  });
-});
-
 router.post('/upload', upload.single('file'), (req, res) => {
-
-  console.log('Starting upload ' + req.file.filename);
-  var validFiles = true;
-  var validFrames;
+  log.info('Starting upload ' + req.file.filename);
+  let validFrames = false;
+  let validFiles = true;
+  let thumbnail = false;
   fs.createReadStream('data/notes/' + req.file.filename)
   .pipe(zip.Parse())
   .on('entry', (entry) => {
@@ -76,23 +67,23 @@ router.post('/upload', upload.single('file'), (req, res) => {
       entry.autodrain();
     }
     else if(entry.path == "thumb.png") {
+      thumbnail = true;
       entry.pipe(fs.createWriteStream('data/thumbnails/' + req.file.filename + '.png'));
     }
     else entry.autodrain();
-  
   })
   .on('error', (err) => {
     validFiles = false;
   })
   .on('finish', () => {
-
     if(validFiles && validFrames) {
-      console.log('Upload ' + req.file.filename + ' completed.');
+      log.info(`Uploaded note ${req.file.filename} by author ${req.auth.user}`);
       db.insertNote(req.file.filename, req.auth.user, (err) => {
         res.sendStatus(200);
       });
     } else {
-      console.log('Upload ' + req.file.filename + ' failed: invalid files');
+      log.error('Upload ' + req.file.filename + ' failed: invalid files');
+      if (thumbnail) fs.unlink('data/thumbnails/' + req.file.filename, (err) => { if(err) throw err });
       fs.unlink('data/notes/' + req.file.filename, (err) => { if(err) throw err });
       res.sendStatus(400); 
     }

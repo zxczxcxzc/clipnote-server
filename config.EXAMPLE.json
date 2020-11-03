@@ -1,0 +1,16 @@
+{
+	"version": 2.00,
+
+	"serverTitle": "Clipnote Server",
+	"serverMOTD": "example clipnote server",
+	"signupURL": "example.com/signup",
+
+	"dbString": "REPLACE THIS WITH A MONGODB CONNECTION STRING",
+	"dbName": "clip",
+
+	"renderUploads": false,
+
+	"uploadSizeLimit": 10000000,
+
+	"port": 3000
+}

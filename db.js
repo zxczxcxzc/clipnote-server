@@ -1,98 +1,72 @@
-	/* database functions */
-const mysql = require('mysql');
-var connection;
+/* database functions */
+const MongoClient = require('mongodb').MongoClient;
+const log = require('./log.js');
+var db;
 module.exports = {
-	connect: function(config) {
-		connection = mysql.createConnection({
- 			host     : config.sqlHost,
-  			user     : config.sqlUser,
-			password : config.sqlPassword, 
-			database : config.sqlDB
-		});
-		connection.connect();
+	connect: function(server, database) {
+		MongoClient.connect(server, {useUnifiedTopology: true}, function(err, client) {
+		if(err) throw err;
+		else {
+			db = client.db(database);
+			log.info("Connected to database");
+		}
+	  });
 	},
-
-	listNotes: function(page, sort, cb) {
-		var totalQuery = 'SELECT count(id) FROM notes WHERE hidden = 0';
-		var query = 'SELECT uuid, author, locked, spinoff, rating, time FROM notes WHERE hidden = 0';
-		switch (sort) {
+	
+	listNotes: function(page, sort, max, cb) {
+		if(max === undefined) max = 6;
+		var skip = max * (page - 1);
+		var order;
+		switch(sort) {
 			case 'time':
-				query += ' ORDER BY time DESC';
+				order = {time: -1};
 				break;
 			case 'score':
-				query += ' ORDER BY rating DESC';
+				order = {rating: -1};
+				break;
+			default: 
+				order = {time: 1};
 				break;
 		}
-		if(page !== undefined) query += ' LIMIT ?, 6';
-		start_index = (page - 1) * 6;
-		connection.query(totalQuery, function(error, results, fields) {
-			connection.query(query, [start_index], function (err, res, field) {
-				var totalPages = Math.ceil(results[0]['count(id)'] / 6);
-				var response = {
-			     	notes:      res,
-			     	totalPages: totalPages
-			    }
-				return cb(err, response);
+		db.collection("notes").find({}).toArray(function(err, res) {
+			var total = Math.ceil(res.length / max);
+			db.collection("notes").find({}, {projection: {_id: 0}}).skip(skip).limit(parseInt(max)).sort(order).toArray(function(error, result) {
+				return cb(error, {notes: result, totalPages: total});
 			});
 		});
 	},
 
 	getNote: function(note, cb) {
-		connection.query('SELECT uuid, author, locked, spinoff, rating, time FROM notes WHERE uuid = ?', [note], function (error, results, fields) {
-  			return cb(error, results);
-		});	
+		db.collection("notes").findOne({uuid: note}, {projection: {_id: 0}}, function(err, result) {
+			return cb(err, result);
+		});
 	},
 
 	insertNote: function(uuid, author, cb) {
-		connection.query('INSERT INTO notes (uuid, author) VALUES (?, ?)', [uuid, author], function (error, results, fields) {
-			return cb(error);
+		var obj = {
+			uuid: uuid,
+			author: author,
+			locked: false,
+			spinoff: false,
+			rating: 0,
+			time: new Date()
+		}
+		db.collection("notes").insertOne(obj, function(err, res) {
+			if (err) throw err;
+			return cb(err);
 		});
 	},
 
 	getUser: function(username, cb) {
-		connection.query('SELECT SUM(rating) FROM notes WHERE author = ?', [username], function(error, results, fields) {
-			var totalStars = results[0]['SUM(rating)'];
-			connection.query('SELECT username, permissions, stars, joinDate FROM users WHERE username = ?', [username], function(err, res, field) {
-				var response = {
-					username: 	 res[0].username,
-					permissions: res[0].permissions,
-					noteStars:   totalStars,
-					userStars:   res[0].stars,
-					joinDate:    res[0].joinDate
-				}
-				return cb(error, response);
-			});
+		db.collection("users").findOne({username: username}, {projection: {_id: 0, username: 1, permissions: 1, stars: 1, joinDate: 1}}, function (err, res) {
+			return cb(err, res);
 		});
-		
 	},
 
 	getUserHash: function(username, cb) {
-		connection.query('SELECT hash FROM users WHERE username = ?', [username], function(error, results, fields) {
-			return cb(error, results[0].hash);
+		db.collection("users").findOne({username: username}, {projection: {hash: 1}}, function(err, res) {
+			if(res !== null) return cb(err, res['hash']);
+			else return cb(err, null)
 		});
 	},
-
-	addUserStar: function(username, stars, cb) {
-		connection.query('UPDATE users SET stars = stars + ? WHERE username = ?', [stars, username], function(error, results, fields) {
-			return cb(error);
-		});
-	},
-
-	addNoteStar: function(user, uuid, cb) {
-		this.getUser(user, (err, res) => {
-			if(res[0].stars <= 0) return cb("ERROR: No stars");
-			else {
-				connection.query('UPDATE users SET stars = stars - 1 WHERE username = ?', [user], function(error, results, fields) {
-					if(error) return cb(error);
-					else {
-						connection.query('UPDATE notes SET rating = rating + 1 WHERE uuid = ?', [uuid], function(e, r, f) {
-							if(error) return cb(error);
-							else return cb(null);
-						});
-					}
-				});
-			}
-		});
-	},
-
 };
