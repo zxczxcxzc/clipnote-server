@@ -1,4 +1,5 @@
-# ![logo](https://i.imgur.com/qS43soQ.png)
+# Clipnote Server
+
 service for sharing animations created with clipnote studio.
 # Setup
 Run `npm install` to install the required packages and then start it with `npm start`.
